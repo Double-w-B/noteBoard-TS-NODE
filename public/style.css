@@ -1,0 +1,149 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,400;0,600;1,400&display=swap");
+
+:root {
+  --white-clr: #fdfffc;
+  --almostBlack-clr: #24243e;
+  --yellow-clr: #fde235;
+  --red-clr: #c1292e;
+}
+
+* {
+  box-sizing: border-box;
+  outline: none;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Exo", sans-serif;
+  width: 100%;
+  height: 100vh;
+}
+
+#app {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding-top: 3rem;
+  background: #0f0c29;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.add {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--red-clr);
+  color: var(--white-clr);
+  border: none;
+  border-radius: 3px;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s linear;
+}
+
+.add .fas {
+  margin-right: 0.5rem;
+}
+
+.add:hover {
+  opacity: 0.8;
+}
+
+.add:active {
+  transform: scale(0.98);
+}
+
+.note {
+  background-color: var(--white-clr);
+  box-shadow: 0 0 10px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  margin: 30px 20px;
+  height: 400px;
+  width: 400px;
+}
+
+.note .tools {
+  background-color: var(--yellow-clr);
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  border-radius: 5px 5px 0 0;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.note .tools img {
+  width: 40px;
+  position: absolute;
+  bottom: 2px;
+  bottom: 1rem;
+  left: 50%;
+  transform: translate(-50%) rotate(-10deg);
+}
+
+.note .tools button {
+  background-color: transparent;
+  border: none;
+  color: var(--almostBlack-clr);
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-left: 1rem;
+  transition: 0.3s linear;
+}
+
+.note .tools button .fas {
+  margin-right: 0.2rem;
+}
+
+.note .tools button:active {
+  transform: scale(0.8);
+}
+
+.note textarea {
+  outline: none;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--almostBlack-clr);
+  border: none;
+  height: calc(100% - 2.5rem);
+  width: 100%;
+  padding: 0.5rem;
+  resize: none;
+}
+
+.main {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--almostBlack-clr);
+}
+
+.hidden {
+  display: none;
+}
+
+.add.animation {
+  animation: scale 0.8s ease-in-out infinite alternate;
+  -webkit-keyframes: scale 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes scale {
+  0% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
