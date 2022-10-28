@@ -9,6 +9,8 @@ app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
+app.use(express.json());
+
 app.use("/api/v1/notes", routes);
 
 const port = 3000;
