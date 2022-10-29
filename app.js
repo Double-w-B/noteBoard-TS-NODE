@@ -5,6 +5,7 @@ const routes = require("./routes/notesRoutes");
 const connectDB = require("./db/connectDB");
 require("dotenv").config();
 const notFound = require("./middleware/notFound");
+const errorHandlerMiddleware = require("./middleware/errorHandler");
 
 app.get("/", (req, res) => {
   res.send("Hello world");
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/v1/notes", routes);
 /* Custom error message */
 app.use(notFound);
+app.use(errorHandlerMiddleware);
 
 const port = 3000;
 
