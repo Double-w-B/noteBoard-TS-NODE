@@ -1,19 +1,32 @@
+type Note = {
+  _id?: string;
+  text?: string;
+  __v?: number;
+};
+
 class App {
   appContainer: HTMLDivElement;
-  notes: string[];
+  notes: object[];
   constructor() {
     this.appContainer = document.getElementById("app") as HTMLDivElement;
-    this.notes = JSON.parse(localStorage.getItem("notes")!) as string[];
+    this.notes = [] as object[];
 
     this.checkSavedNotes();
-    this.createAddButton();
   }
 
-  checkSavedNotes() {
-    if (this.notes) {
-      this.notes.forEach((note) =>
-        this.appContainer.appendChild(this.addNewNote(note))
-      );
+  async checkSavedNotes(): Promise<void | (() => object[])> {
+    try {
+      const response = await fetch("/api/v1/notes");
+      const data = await response.json();
+      this.notes = data.notes;
+      this.appContainer.innerHTML = "";
+      this.createAddButton();
+
+      this.notes.forEach((note: Note) => {
+        this.appContainer.appendChild(this.addNewNote(note.text, note._id));
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -27,17 +40,20 @@ class App {
     const textNode = document.createTextNode("Add note");
     button.appendChild(textNode);
     this.appContainer.appendChild(button);
+
     (this.notes === null || this.notes?.length < 1) &&
       button.classList.add("animation");
+
     button.addEventListener("click", () => {
       button.classList.remove("animation");
       this.appContainer.appendChild(this.addNewNote());
     });
   }
 
-  addNewNote(text = "") {
+  addNewNote(text = "", id = "") {
     const note = document.createElement("div") as HTMLDivElement;
     note.className = "note";
+    note.id = id;
 
     const tools = document.createElement("div") as HTMLDivElement;
     tools.className = "tools";
@@ -74,19 +90,24 @@ class App {
     const editBtn = note.querySelector(".edit") as HTMLButtonElement;
     const deleteBtn = note.querySelector(".delete") as HTMLButtonElement;
 
-    deleteBtn.addEventListener("click", () => {
-      note.remove();
-      this.updateLS();
+    deleteBtn.addEventListener("click", (e: MouseEvent) => {
+      const targetId = (e.target as Element)!.closest(".note")!.id;
 
-      const savedNotes = JSON.parse(localStorage.getItem("notes")!) as string[];
-      const addButton = document.querySelector(".add");
-      if (savedNotes.length < 1) {
-        addButton!.classList.add("animation");
+      try {
+        fetch(`/api/v1/notes/${targetId}`, { method: "DELETE" }).then(() =>
+          this.checkSavedNotes()
+        );
+      } catch (error) {
+        console.log(error);
       }
     });
 
-    editBtn.addEventListener("click", () => {
+    editBtn.addEventListener("click", (e: MouseEvent) => {
       if (!textArea.value.trim()) return;
+
+      const target = e.target as Element;
+      const noteContainer = target.closest(".note");
+      const noteTextArea = noteContainer!.lastChild as HTMLInputElement;
 
       main.classList.toggle("hidden");
       textArea.classList.toggle("hidden");
@@ -97,6 +118,27 @@ class App {
       const editTxt = document.createTextNode("Edit");
 
       if (editBtn.innerText === "Save") {
+        const noteTxt = noteTextArea!.value;
+
+        if (!noteContainer!.id) {
+          /* Save note to a DB */
+          const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: noteTxt }),
+          };
+
+          fetch("/api/v1/notes", requestOptions);
+        } else {
+          /* update note in a DB */
+          const requestOptions = {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: noteTxt }),
+          };
+
+          fetch(`/api/v1/notes/${noteContainer!.id}`, requestOptions);
+        }
         editBtn.innerText = "";
         img.classList.remove("hidden");
         editBtn.appendChild(icon);
@@ -113,19 +155,9 @@ class App {
       const { value } = e.target as HTMLInputElement;
 
       main.innerText = value;
-      this.updateLS();
     });
 
     return note;
-  }
-
-  updateLS() {
-    const notesText = document.querySelectorAll("textarea");
-    const notes: string[] = [];
-
-    notesText.forEach((note) => note.value.trim() && notes.push(note.value));
-
-    localStorage.setItem("notes", JSON.stringify(notes));
   }
 }
 

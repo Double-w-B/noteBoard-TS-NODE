@@ -7,10 +7,8 @@ require("dotenv").config();
 const notFound = require("./middleware/notFound");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 
-app.get("/", (req, res) => {
-  res.send("Hello world");
-});
 // middleware
+app.use(express.static("./public"));
 app.use(express.json());
 
 /* routes */
