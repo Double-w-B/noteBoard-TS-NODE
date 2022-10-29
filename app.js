@@ -4,14 +4,18 @@ const routes = require("./routes/notesRoutes");
 
 const connectDB = require("./db/connectDB");
 require("dotenv").config();
+const notFound = require("./middleware/notFound");
 
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
-
+// middleware
 app.use(express.json());
 
+/* routes */
 app.use("/api/v1/notes", routes);
+/* Custom error message */
+app.use(notFound);
 
 const port = 3000;
 
