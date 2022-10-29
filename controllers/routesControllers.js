@@ -1,67 +1,48 @@
 const NoteSchema = require("../models/notesSchema");
+const asyncWrapper = require("../middleware/async");
 
-const getAllNotes = async (req, res) => {
-  try {
-    const notes = await NoteSchema.find({});
-    res.status(200).json({ notes });
-  } catch (error) {
-    res.status(500).json({ msg: error });
+const getAllNotes = asyncWrapper(async (req, res) => {
+  const notes = await NoteSchema.find({});
+  res.status(200).json({ nbHits: notes.length, notes });
+});
+
+const createNewNote = asyncWrapper(async (req, res) => {
+  const note = await NoteSchema.create(req.body);
+  res.status(201).json({ note });
+});
+
+const getSingleNote = asyncWrapper(async (req, res) => {
+  const { id: noteId } = req.params;
+  const note = await NoteSchema.findOne({ _id: noteId });
+  if (!note) {
+    return res
+      .status(404)
+      .json({ msg: `There is no note with a such id: ${noteId}` });
   }
-};
+  res.status(200).json({ note });
+});
 
-const createNewNote = async (req, res) => {
-  try {
-    const note = await NoteSchema.create(req.body);
-    res.status(201).json({ note });
-  } catch (error) {
-    res.status(500).json({ msg: error });
+const updateNote = asyncWrapper(async (req, res) => {
+  const { id: noteId } = req.params;
+  const note = await NoteSchema.findOneAndUpdate({ _id: noteId }, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!note) {
+    return res.status(404).json({ msg: `No note with id: ${noteId}` });
   }
-};
+  res.status(200).json({ note });
+});
 
-const getSingleNote = async (req, res) => {
-  try {
-    const { id: noteId } = req.params;
-    const note = await NoteSchema.findOne({ _id: noteId });
-    if (!note) {
-      return res
-        .status(404)
-        .json({ msg: `There is no note with a such id: ${noteId}` });
-    }
-    res.status(200).json({ note });
-  } catch (error) {
-    res.status(500).json({ msg: error });
+const deleteNote = asyncWrapper(async (req, res) => {
+  const { id: noteId } = req.params;
+  const note = await NoteSchema.findOneAndDelete({ _id: noteId });
+
+  if (!note) {
+    return res.status(404).json({ msg: `No such note with id: ${noteId}` });
   }
-};
-
-const updateNote = async (req, res) => {
-  try {
-    const { id: noteId } = req.params;
-    const note = await NoteSchema.findOneAndUpdate({ _id: noteId }, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!note) {
-      return res.status(404).json({ msg: `No note with id: ${noteId}` });
-    }
-    res.status(200).json({ note });
-  } catch (error) {
-    res.status(500).json({ msg: error });
-  }
-};
-
-const deleteNote = async (req, res) => {
-  try {
-    const { id: noteId } = req.params;
-    const note = await NoteSchema.findOneAndDelete({ _id: noteId });
-
-    if (!note) {
-      return res.status(404).json({ msg: `No such note with id: ${noteId}` });
-    }
-    res.status(200).json({ note });
-  } catch (error) {
-    res.status(500).json({ msg: error });
-  }
-};
+  res.status(200).json({ note });
+});
 
 module.exports = {
   getAllNotes,
