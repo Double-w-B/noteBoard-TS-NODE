@@ -1,23 +1,32 @@
+require("dotenv").config();
+require("express-async-errors");
+
 const express = require("express");
 const app = express();
-const routes = require("./routes/notesRoutes");
 
+// routers
+const authRouter = require("./routes/authRoutes");
+const notesRouter = require("./routes/notesRoutes");
+
+// connectDB
 const connectDB = require("./db/connectDB");
-require("dotenv").config();
+const authenticateUser = require("./middleware/authentication");
+
+// error handlers
 const notFound = require("./middleware/notFound");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
 
-// middleware
 app.use(express.static("./public"));
 app.use(express.json());
 
 /* routes */
-app.use("/api/v1/notes", routes);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/notes", authenticateUser, notesRouter);
 /* Custom error message */
 app.use(notFound);
 app.use(errorHandlerMiddleware);
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const start = async () => {
   try {
